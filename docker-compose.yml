@@ -1,0 +1,32 @@
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/mlflow.Dockerfile
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:mlruns
+      - ./mlflow.db:/mlflow.db
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow.db
+      --default-artifact-root /mlruns
+
+
+  trainer:
+    build:
+      context: .
+      dockerfile: docker/trainer.Dockerfile
+    container_name: mlflow_trainer
+    depends_on:
+      - mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    command: ["python", "-m", "src.train"]

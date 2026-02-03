@@ -1,6 +1,7 @@
 import mlflow
 import mlflow.sklearn
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
@@ -13,6 +14,8 @@ from .features import build_preprocessor
 import os
 print("MLFLOW_TRACKING_URI env:", os.getenv("MLFLOW_TRACKING_URI"))
 print("mlflow tracking uri:", mlflow.get_tracking_uri())
+
+Path("/app/reports/figures").mkdir(parents=True, exist_ok=True)
 
 def train_baseline(cfg: TrainConfig):
     df = load_data(cfg.data_path)
@@ -57,10 +60,16 @@ def train_baseline(cfg: TrainConfig):
         plt.ylabel("Actual")
         for (i, j), v in __import__("numpy").ndenumerate(cm):
             plt.text(j, i, str(v), ha="center", va="center")
-        artifact_path = "reports/figures/confusion_matrix.png"
+
+        ART_DIR = Path("/app/reports/figures")
+        ART_DIR.mkdir(parents=True, exist_ok=True)
+
+        artifact_path = ART_DIR / "confusion_matrix.png"
+
         fig.savefig(artifact_path, bbox_inches="tight")
         plt.close(fig)
-        mlflow.log_artifact(artifact_path)
+
+        mlflow.log_artifact(artifact_path, artifact_path="figures")
 
         # Log + register model
         mlflow.sklearn.log_model(

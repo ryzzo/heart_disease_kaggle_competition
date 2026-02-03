@@ -7,12 +7,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 
 from .config import TrainConfig
-from .data import load_data, split_xy, make_train_test
+from .data import load_data, split_xy_and_encode, make_train_test
 from .features import build_preprocessor
 
 def tune(cfg: TrainConfig, n_trials: int = 25):
     df = load_data(cfg.data_path)
-    X, y = split_xy(df, cfg.target_col)
+    X, y = split_xy_and_encode(df, cfg.target_col, cfg.positive_label, cfg.negative_label)
     X_train, X_test, y_train, y_test = make_train_test(X, y, cfg.test_size, cfg.random_state)
 
     preprocessor = build_preprocessor(X_train)

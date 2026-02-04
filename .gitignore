@@ -1,8 +1,58 @@
-.venv/
+# Python
 __pycache__/
-*.pyc 
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Virtual environments
+conda-env/
+.conda/
+
+# MLflow
 mlruns/
 mlflow.db
-reports/figures/*.png
-models/
+mlflow.sqlite
+mlflow.db-journal
+
+# Artifacts & outputs
+artifacts/
+outputs/
+predictions/
+*.pkl
+*.joblib
+*.onnx
+*.h5
+*.pt
+*.ckpt
+
+# Optuna
+optuna.db
+optuna.sqlite
+optuna.db-journal
+
+# Data (local / generated)
+data/
+datasets/
+*.csv
+*.parquet
+*.feather
+*.npy
+*.npz
+
+# Logs & caches
+logs/
+*.log
+.cache/
+.pytest_cache/
+.mypy_cache/
+
+# OS / editor junk
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

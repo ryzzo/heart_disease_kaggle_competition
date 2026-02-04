@@ -1,0 +1,12 @@
+name: heart-disease-kaggle
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - mlflow>=2.10
+      - scikit-learn>=1.4
+      - pandas>=2.2
+      - pyyaml>=6.0
+      - optuna>=3.6

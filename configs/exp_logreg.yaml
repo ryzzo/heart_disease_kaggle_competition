@@ -1,0 +1,17 @@
+experiment:
+  name: logreg_baseline
+  mode: train
+
+data:
+  test_size: 0.2
+  random_state: 42
+
+model:
+  type: logreg
+
+search:
+  n_trials: 4
+  timeout_seconds: 0
+  C_min: 1.0e-3
+  C_max: 100.0
+  penalty: ["l2", "l1"]

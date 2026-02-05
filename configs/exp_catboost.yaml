@@ -1,0 +1,35 @@
+experiment:
+  name: catboost_baseline
+  mode: train
+
+data:
+  test_size: 0.2
+  random_state: 42
+
+model:
+  type: catboost
+
+# Search space
+search:
+  n_trials: 4
+  timeout_seconds: 0
+
+  iterations_min: 200
+  iterations_max: 2000
+  depth_min: 4
+  depth_max: 10
+
+  learning_rate_min: 1.0e-3
+  learning_rate_max: 0.3
+
+  l2_leaf_reg_min: 1.0
+  l2_leaf_reg_max: 10.0
+
+  subsample_min: 0.5
+  subsample_max: 1.0
+
+  random_strength_min: 0.0
+  random_strength_max: 5.0
+
+  bagging_temperature_min: 0.0
+  bagging_temperature_max: 10.0

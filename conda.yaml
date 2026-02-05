@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.11
   - xgboost
+  - catboost
   - pip
   - pip:
       - mlflow>=2.10

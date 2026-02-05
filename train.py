@@ -28,15 +28,6 @@ def read_csv_checked(path: str | Path) -> pd.DataFrame:
 
         return pd.read_csv(path)
 
-def make_preprocess_pipeline(X):
-    numeric_cols = X.select_dtypes(include=["number"]).columns
-
-    return ColumnTransformer(
-        transformers=[
-            ("num", StandardScaler(), numeric_cols),
-        ],
-    )
-
 def encode_target(y):
     le = LabelEncoder()
     return le.fit_transform(y), le
@@ -69,16 +60,12 @@ def main():
     )
     random_state = int(cfg["data"]["random_state"])
 
-    X_transformer = make_preprocess_pipeline(X_train)
-    X_train_scaled = X_transformer.fit_transform(X_train)
-    X_test_scaled = X_transformer.transform(X_test)
-
     y_train_encoded, encoder = encode_target(y_train)
     y_test_encoded = encoder.transform(y_test)
 
     def evaluate(model):
-        model.fit(X_train_scaled, y_train_encoded)
-        preds = model.predict(X_test_scaled)
+        model.fit(X_train, y_train_encoded)
+        preds = model.predict(X_test)
         acc = accuracy_score(y_test_encoded, preds)
 
         scores = (
@@ -109,11 +96,7 @@ def main():
     artifacts_dir = Path("artifacts")
     artifacts_dir.mkdir(exist_ok=True)
 
-    x_path = artifacts_dir / "X_transform.pkl"
     y_path = artifacts_dir / "y_transform.pkl"
-
-    with open(x_path, "wb") as f:
-        pickle.dump(X_transformer, f)
 
     with open(y_path, "wb") as f:
         pickle.dump(encoder, f)
@@ -130,6 +113,13 @@ def main():
         )
 
         best_params = study.best_params
+
+        # unpack combined choice into fields build() expects
+        if "solver_penalty" in best_params:
+            solver, penalty = best_params.pop("solver_penalty")
+            best_params["solver"] = solver
+            best_params["penalty"] = penalty
+
         best_model = mod.build(best_params, random_state)
         best_acc, best_auc = evaluate(best_model)
 
@@ -141,7 +131,6 @@ def main():
             pickle.dump(best_model, f)
 
         mlflow.log_artifact(str(model_path), artifact_path="best_model_artifact")
-        mlflow.log_artifact(str(x_path), artifact_path="x_transformer_artifact")
         mlflow.log_artifact(str(y_path), artifact_path="y_transformer_artifact")
         mlflow.sklearn.log_model(best_model, artifact_path="best_model_mlflow")
 

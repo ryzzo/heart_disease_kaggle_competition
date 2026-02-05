@@ -12,6 +12,16 @@ model:
 search:
   n_trials: 4
   timeout_seconds: 0
+
+  # continous ranges
   C_min: 1.0e-3
   C_max: 100.0
-  penalty: ["l2", "l1"]
+  tol_min: 1.0e-6
+  tol_max: 1000.0
+  max_iter_min: 200
+  max_iter_max: 5000
+
+  # categorical choices
+  class_weight: [null, "balanced"]
+  fit_intercept: [true, false]
+  warm_start: [true, false]

@@ -33,6 +33,14 @@ optuna.db
 optuna.sqlite
 optuna.db-journal
 
+# CatBoost
+catboost_info/
+catboost/
+*.cbm
+*.model
+*.snapshot
+*.core
+
 # Data (local / generated)
 data/
 datasets/

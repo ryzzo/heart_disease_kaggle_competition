@@ -103,3 +103,6 @@ def build(params, random_state):
         ("scaler", StandardScaler()),
         ("model", clf),
     ])
+
+def fit(model, X_train, y_train, X_val, y_val, trial, cfg):
+    model.fit(X_train, y_train)

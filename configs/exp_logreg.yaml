@@ -17,7 +17,7 @@ search:
   C_min: 1.0e-3
   C_max: 100.0
   tol_min: 1.0e-6
-  tol_max: 1000.0
+  tol_max: 1.0e-2
   max_iter_min: 200
   max_iter_max: 5000
 

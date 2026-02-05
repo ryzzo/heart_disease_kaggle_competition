@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
+  - xgboost
   - pip
   - pip:
       - mlflow>=2.10

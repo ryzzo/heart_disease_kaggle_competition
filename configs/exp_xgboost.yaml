@@ -1,0 +1,40 @@
+experiment:
+  name: xgboost_baseline
+  mode: train
+
+data:
+  test_size: 0.2
+  random_state: 42
+
+model:
+  type: xgboost
+
+search:
+  n_trials: 4
+  timeout_seconds: 0
+
+  # Tree size / complexity
+  n_estimators_min: 200
+  n_estimators_max: 2000
+  max_depth_min: 2
+  max_depth_max: 10
+
+  # Learning dynamics
+  learning_rate_min: 1.0e-3
+  learning_rate_max: 0.3
+
+  # sampling
+  subsample_min: 0.5
+  subsample_max: 1.0
+  colsample_bytree_min: 0.5
+  colsample_bytree_max: 1.0
+
+  # Regularization
+  min_child_weight_min: 1.0
+  min_child_weight_max: 20.0
+  gamma_min: 0.0
+  gamma_max: 10.0
+  reg_alpha_min: 1.0e-8
+  reg_alpha_max: 10.0
+  reg_lambda_min: 1.0e-8
+  reg_lambda_max: 10.0

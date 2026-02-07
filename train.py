@@ -2,6 +2,7 @@ import sys
 import yaml
 import pickle
 from pathlib import Path
+import inspect
 
 import mlflow
 import mlflow.sklearn
@@ -72,6 +73,12 @@ def main():
     model_type = cfg["model"]["type"]
     mod = get_model_module(model_type)
 
+    def build_model(mod, params, random_state, cfg):
+        sig = inspect.signature(mod.build)
+        if "cfg" in sig.parameters:
+            return mod.build(params, random_state, cfg=cfg)
+        return mod.build(params, random_state)
+
     def evaluate_on(model, X_eval, y_eval_encoded):
         if len(X_eval) != len(y_eval_encoded):
             raise ValueError(f"Length mismatch: X_eval={len(X_eval)} vs y_eval={len(y_eval_encoded)}")
@@ -89,7 +96,7 @@ def main():
 
     def objective(trial):
         params = mod.suggest(trial, cfg)
-        model = mod.build(params, random_state)
+        model = build_model(mod, params, random_state, cfg)
         
         if hasattr(mod, "fit"):
             mod.fit(model, X_train, y_train_encoded, X_val, y_val_encoded, trial, cfg)
@@ -133,9 +140,29 @@ def main():
             best_params["solver"] = solver
             best_params["penalty"] = penalty
 
-        best_model = mod.build(best_params, random_state)
+        best_model = build_model(mod, best_params, random_state, cfg)
 
-        best_model.fit(X_trainval, encoder.transform(y_trainval))
+        if model_type == "xgboost":
+            es = int(cfg.get("training", {}).get("early_stopping_rounds", 50))
+            best_model.set_params(early_stopping_rounds=es)
+            best_model.fit(
+                X_trainval, encoder.transform(y_trainval),
+                eval_set=[(X_val, y_val_encoded)],
+                verbose=False,
+            )
+
+        elif model_type == "catboost":
+            es = int(cfg.get("training", {}).get("early_stopping_rounds", 50))
+            best_model.set_params(early_stopping_rounds=es)
+            best_model.fit(
+                X_trainval, encoder.transform(y_trainval),
+                eval_set=(X_val, y_val_encoded),
+                verbose=False,
+            )
+
+        else:
+            best_model.fit(X_trainval, encoder.transform(y_trainval))
+
         test_acc, test_auc = evaluate_on(best_model, X_test, y_test_encoded)
 
         mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})

@@ -1,4 +1,5 @@
 from catboost import CatBoostClassifier
+from optuna.integration import CatBoostPruningCallback
 
 def suggest(trial, cfg):
     # Fixed training (mode: train)
@@ -49,4 +50,15 @@ def build(params, random_state):
         random_seed=random_state,
         verbose=False,
         thread_count=-1,
+    )
+
+def fit(model, X_train, y_train, X_val, y_val, trial, cfg):
+    es = int(cfg.get("training", {}).get("early_stopping_rounds", 50))
+    model.set_params(early_stopping_rounds=es)
+
+    model.fit(
+        X_train, y_train,
+        eval_set=(X_val, y_val),
+        callbacks=[CatBoostPruningCallback(trial, "AUC")],
+        verbose=False,
     )

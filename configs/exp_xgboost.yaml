@@ -38,3 +38,6 @@ search:
   reg_alpha_max: 10.0
   reg_lambda_min: 1.0e-8
   reg_lambda_max: 10.0
+
+training:
+  early_stopping_rounds: 50

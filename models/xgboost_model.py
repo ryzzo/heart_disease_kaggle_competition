@@ -1,4 +1,8 @@
 from xgboost import XGBClassifier
+from xgboost.callback import EarlyStopping
+from optuna.integration import XGBoostPruningCallback
+from optuna.exceptions import TrialPruned
+from sklearn.metrics import roc_auc_score
 
 def suggest(trial, cfg):
     search_cfg = cfg["search"]
@@ -52,11 +56,38 @@ def suggest(trial, cfg):
         ),
     }
 
-def build(params, random_state):
+def build(params, random_state, cfg=None):
+    es = 50
+    if cfg is not None:
+        es = int(cfg.get("training", {}).get("early_stopping_rounds", 50))
+
     return XGBClassifier(
         **params,
         random_state=random_state,
         eval_metric="logloss",
         tree_method="hist",
-        n_jobs=-1
+        n_jobs=-1,
+        early_stopping_rounds=es
     )
+
+def fit(model, X_train, y_train, X_val, y_val, trial, cfg):
+    model.fit(
+        X_train, y_train,
+        eval_set=[(X_val, y_val)],
+        verbose=False,
+    )
+
+    # Manual pruning after fit
+    if hasattr(model, "predict_proba"):
+        scores = model.predict_proba(X_val)[:, 1]
+    else:
+        scores = model.decision_function(X_val)
+
+    auc = roc_auc_score(y_val, scores)
+
+    trial.report(auc, step=0)
+    if trial.should_prune():
+        raise TrialPruned()
+    
+    return auc
+    

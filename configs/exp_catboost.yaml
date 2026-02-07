@@ -33,3 +33,6 @@ search:
 
   bagging_temperature_min: 0.0
   bagging_temperature_max: 10.0
+
+training:
+  early_stopping_rounds: 50

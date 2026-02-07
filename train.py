@@ -115,6 +115,8 @@ def main():
 
     artifacts_dir = Path("artifacts")
     artifacts_dir.mkdir(exist_ok=True)
+    model_dir = Path("artifacts") / model_type
+    model_dir.mkdir(parents=True, exist_ok=True)
 
     y_path = artifacts_dir / "y_encoder.pkl"
     with open(y_path, "wb") as f:
@@ -168,12 +170,12 @@ def main():
         mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
         mlflow.log_metrics({"test_accuracy": test_acc, "best_roc_auc": test_auc})
 
-        model_path = artifacts_dir / "best_model.pkl"
+        model_path = model_dir / "best_model.pkl"
         with open(model_path, "wb") as f:
             pickle.dump(best_model, f)
 
-        mlflow.log_artifact(str(model_path), artifact_path="best_model_artifact")
-        mlflow.sklearn.log_model(best_model, artifact_path="best_model_mlflow")
+        mlflow.log_artifact(str(model_path), artifact_path=f"best_model/{model_type}")
+        mlflow.sklearn.log_model(best_model, artifact_path=f"model_{model_type}")
 
         print("Best model saved")
 

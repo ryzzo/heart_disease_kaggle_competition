@@ -5,6 +5,7 @@ dependencies:
   - python=3.11
   - xgboost
   - catboost
+  - lightgbm
   - pip
   - pip:
       - mlflow>=2.10

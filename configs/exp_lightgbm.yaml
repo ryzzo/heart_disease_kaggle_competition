@@ -1,0 +1,48 @@
+experiment:
+  name: lightgbm_baseline
+  mode: train
+
+data:
+  test_size: 0.2
+  random_state: 42  
+
+model:
+  type: lightgbm    
+
+search:
+  n_trials: 4
+  timeout_seconds: 0
+
+  # Core
+  n_estimators_min: 200
+  n_estimators_max: 2000
+  learning_rate_min: 1.0e-3
+  learning_rate_max: 0.3
+
+  # Tree structure
+  max_depth_min: -1
+  max_depth_max: 12
+  num_leaves_min: 16
+  num_leaves_max: 256
+  min_child_samples_min: 5
+  min_child_samples_max: 100
+  
+  # Sampling
+  subsample_min: 0.5
+  subsample_max: 1.0
+  colsample_bytree_min: 0.5
+  colsample_bytree_max: 1.0
+
+  # Regularization
+  reg_alpha_min: 1.0e-8
+  reg_alpha_max: 10.0
+  reg_lambda_min: 1.0e-8
+  reg_lambda_max: 10.0
+
+  # Split gain
+  min_split_gain_min: 0.0
+  min_split_gain_max: 5.0
+
+  # Categorical
+  class_weight: [null, "balanced"]
+  boosting_type: ["gbdt", "dart"]
